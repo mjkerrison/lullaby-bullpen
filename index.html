@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom YouTube Playlist</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #player {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+        }
+        #playlist {
+            margin-top: 20px;
+        }
+        .video-item {
+            cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .video-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Custom YouTube Playlist</h1>
+    <div id="player"></div>
+    <div id="playlist"></div>
+
+    <script>
+        // YouTube video IDs
+        const videoIds = [
+            'dQw4w9WgXcQ',
+            'ZZ5LpwO-An4',
+            '9bZkp7q19f0'
+        ];
+
+        let player;
+        let currentVideoIndex = 0;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: videoIds[0],
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+            loadPlaylist();
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                playNextVideo();
+            }
+        }
+
+        function loadPlaylist() {
+            const playlist = $('#playlist');
+            videoIds.forEach((id, index) => {
+                playlist.append(`<div class="video-item" data-index="${index}">Video ${index + 1}</div>`);
+            });
+
+            $('.video-item').click(function() {
+                const index = $(this).data('index');
+                currentVideoIndex = index;
+                player.loadVideoById(videoIds[index]);
+            });
+        }
+
+        function playNextVideo() {
+            currentVideoIndex++;
+            if (currentVideoIndex >= videoIds.length) {
+                currentVideoIndex = 0;
+            }
+            player.loadVideoById(videoIds[currentVideoIndex]);
+        }
+    </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+</html>
